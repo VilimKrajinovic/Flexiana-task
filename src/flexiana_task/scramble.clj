@@ -14,17 +14,7 @@
             counts2)))
 
 (comment
-  ; should return true
-  (scramble? "rekqodlw" "world")
-  (scramble? "cedewaraaossoqqyt" "codewars")
-  (scramble? nil nil)
-  (scramble? "" "")
-
-  ; TODO: what should this return?
-  (scramble? "something" nil)
-  (scramble? "something" "")
-
-  ; should return false
-  (scramble? "katas" "steak")
-  (scramble? nil "something")
-  (scramble? "" "something"))
+  (scramble? "rekqodlw" "world") ; true
+  (scramble? "cedewaraaossoqqyt" "codewars") ; true
+  (scramble? "katas" "steak") ; false
+  )
