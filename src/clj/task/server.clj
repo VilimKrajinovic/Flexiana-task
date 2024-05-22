@@ -1,6 +1,6 @@
-(ns flexiana-task.server
+(ns task.server
   (:gen-class)
-  (:require [flexiana-task.scramble :refer [scramble?]]
+  (:require [task.scramble :refer [scramble?]]
             [muuntaja.core :as muuntaja]
             [reitit.ring :as ring]
             [reitit.coercion.malli :as rcm]
@@ -10,6 +10,7 @@
             [clojure.tools.logging :as log]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.params :refer [wrap-params]]
+            [ring.middleware.cors :refer [wrap-cors]]
             [ring.util.http-response :refer [ok bad-request]]))
 
 (def RequestPayload
@@ -39,24 +40,40 @@
       (ok {:result (scramble? str1 str2)})
       (bad-request {:error "Missing or invalid parameters"}))))
 
+(defn add-cors-headers [handler]
+  (fn [request]
+    (let [response (handler request)]
+      (-> response
+          (assoc-in [:headers "Access-Control-Allow-Origin"] "*")
+          (assoc-in [:headers "Access-Control-Allow-Methods"] "GET, POST, PUT, DELETE, OPTIONS")
+          (assoc-in [:headers "Access-Control-Allow-Headers"] "Content-Type, Authorization")
+          (assoc-in [:headers "Access-Control-Allow-Credentials"] "true")))))
+
+(def routes
+  [["/scramble" {:get {:parameters {:query RequestPayload}
+                       :responses {200 {:body ResponsePayload}
+                                   400 {:body ErrorPayload}}
+                       :handler handle-get}
+                 :post {:parameters {:body RequestPayload}
+                        :responses {200 {:body ResponsePayload}
+                                    400 {:body ErrorPayload}}
+                        :handler handle-post}
+                 :options ring/default-options-handler}]])
+
 (def app
-  (ring/ring-handler
-   (ring/router [["/scramble" {:get {:parameters {:query RequestPayload}
-                                     :responses {200 {:body ResponsePayload}
-                                                 400 {:body ErrorPayload}}
-                                     :handler handle-get}
-                               :post {:parameters {:body RequestPayload}
-                                      :responses {200 {:body ResponsePayload}
-                                                  400 {:body ErrorPayload}}
-                                      :handler handle-post}}]]
-                {:data {:muuntaja muuntaja/instance
-                        :coercion reitit.coercion.malli/coercion
-                        :middleware [reitit.ring.middleware.muuntaja/format-middleware
-                                     wrap-params
-                                     rrc/coerce-request-middleware
-                                     rrc/coerce-exceptions-middleware
-                                     rrc/coerce-response-middleware]}})
-   (ring/routes (ring/create-default-handler))))
+  (-> (ring/ring-handler
+       (ring/router routes
+                    {:data {:muuntaja muuntaja/instance
+                            :coercion reitit.coercion.malli/coercion
+                            :middleware [reitit.ring.middleware.muuntaja/format-middleware
+                                         wrap-params
+                                         rrc/coerce-request-middleware
+                                         rrc/coerce-exceptions-middleware
+                                         rrc/coerce-response-middleware]}})
+       (ring/routes
+        (ring/create-resource-handler {:path "/"})
+        (ring/create-default-handler)))
+      add-cors-headers))
 
 (defn- start-server [port]
   (if port

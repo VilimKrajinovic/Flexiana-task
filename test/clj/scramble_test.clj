@@ -1,5 +1,5 @@
-(ns flexiana-task.scramble-test
-  (:require [flexiana-task.scramble :as scramble :refer [scramble?]]
+(ns scramble-test
+  (:require [task.scramble :as scramble :refer [scramble?]]
             [clojure.test :as t :refer [deftest is testing]]))
 
 (deftest test-scrambling

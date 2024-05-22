@@ -1,4 +1,4 @@
-(ns flexiana-task.scramble)
+(ns task.scramble)
 
 (defn- count-chars [str]
   (reduce (fn [counts c]

@@ -1,8 +1,8 @@
-(ns flexiana-task.server-test
+(ns server-test
   (:require [clojure.test :refer [deftest testing is use-fixtures run-tests]]
             [cheshire.core :as json]
             [mount.core :as mount]
-            [flexiana-task.server :as server :refer [app]]
+            [task.server :as server :refer [app]]
             [ring.mock.request :as mock]))
 
 (use-fixtures :once
