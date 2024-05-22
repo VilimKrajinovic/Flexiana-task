@@ -2,6 +2,10 @@
 
 Task for Flexiana
 
-## Usage
+## Commands to run
 
-FIXME
+- npm install
+- lein deps
+- lein run (backend only)
+- lein shadow compile app (compiles cljs)
+- lein dev (both backend and frontend)
