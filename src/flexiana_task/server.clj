@@ -14,8 +14,8 @@
 
 (def RequestPayload
   [:map
-   [:str1 :string]
-   [:str2 :string]])
+   [:str1 {:optional true} :string]
+   [:str2 {:optional true} :string]])
 
 (def ResponsePayload
   [:map
@@ -27,7 +27,6 @@
 
 (defn handle-get [request]
   (let [{:keys [str1 str2]} (-> request :parameters :query)]
-    (log/info request)
     (log/info "Received GET request with parameters" {:str1 str1 :str2 str2})
     (if (and str1 str2)
       (ok {:result (scramble? str1 str2)})
@@ -35,7 +34,6 @@
 
 (defn handle-post [request]
   (let [{:keys [str1 str2]} (-> request :parameters :body)]
-    (log/info request)
     (log/info "Received POST request with parameters" {:str1 str1 :str2 str2})
     (if (and str1 str2)
       (ok {:result (scramble? str1 str2)})
